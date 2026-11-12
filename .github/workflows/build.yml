@@ -1,0 +1,32 @@
+name: Build FPS Unlocker (Multi-DLL MOD)
+
+on:
+  workflow_dispatch: # 允许你在 GitHub 网页上手动点击按钮触发编译
+
+jobs:
+  build:
+    runs-on: windows-latest # 使用最新的 Windows 服务器
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup MSVC (x64)
+      uses: ilammy/msvc-dev-cmd@v1 # 配置 MSVC 编译环境，并指定为 x64 架构
+      with:
+        arch: x64
+
+    - name: Setup MASM (汇编器)
+      uses: glslang/setup-masm@v1 # 配置 MASM，用于编译 syscall.asm
+
+    - name: Build with MSBuild
+      run: |
+        msbuild Genshin_StarRail_fps_unlocker.sln /p:Configuration=Release /p:Platform=x64
+        
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FPS-Unlocker-MultiDLL
+        path: |
+          **/x64/Release/*.exe
+          **/Release/*.exe
